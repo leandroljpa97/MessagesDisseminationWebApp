@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html>
+
+
+{% if user.flag %}
+	<head>
+
+
+
+			<style type="text/css">
+
+
+			.table {
+       		 border-collapse: collapse!important
+		    }
+		    .table td,
+		    .table th {
+		        background-color: #fff!important
+		    }
+		    .table-bordered td,
+		    .table-bordered th {
+		        border: 1px solid #ddd!important
+		    }
+
+			    .table {
+				    max-width: 100%;
+				    margin-bottom: 1rem;
+				    background-color: transparent
+    				overflow: hidden;
+    				width: 50%;
+				}
+
+				.table td,
+				.table th {
+				    padding: .75rem;
+				    vertical-align: top;
+				    border-top: 1px solid #e9ecef
+				}
+				.table thead th {
+				    vertical-align: bottom;
+				    border-bottom: 2px solid #e9ecef
+				}
+				 .table-responsive {
+				        display: block;
+				        width: 100%;
+				        overflow-x: auto;
+				        -ms-overflow-style: -ms-autohiding-scrollbar
+				    }
+				    .table-responsive.table-bordered {
+				        border: 0
+    			}
+   			 </style>
+
+
+
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<script type="text/javascript">
+
+
+				function getLocation() {
+						var x = document.getElementById("demo");
+											
+
+				    if (navigator.geolocation) {
+				        navigator.geolocation.getCurrentPosition(showPosition);
+				    } else { 
+				        x.innerHTML = "Geolocation is not supported by this browser.";
+				    }
+				}
+
+				function showPosition(position) {
+					var y;
+					y=0;
+					var x = document.getElementById("demo");
+				    x.innerHTML = "Latitude: " + position.coords.latitude + 
+				    "<br>Longitude: " + position.coords.longitude; 
+
+				    $.ajax({
+					    type: 'POST',
+					    url: '/app/location/',
+					    data: { 
+					        'lat': position.coords.latitude, 
+					        'longit': position.coords.longitude 
+					    },
+					    success: function(msg){
+					    	y=y+1;
+					       
+					    } ,
+					    error: function( jqXhr, textStatus, errorThrown ){
+                    console.log( errorThrown );
+                		}
+
+					});
+
+				}
+
+
+				function getMessages() {
+					    $.get('/app/getMessages/', function(data){
+					        messages = data.messages;
+					        var table = $('#messages')
+					        var row1= $("<tr/>")
+					        $("#messages tr").remove();
+					        row1.append($("<td/>").append('<h4>Date</h4>'));
+					        row1.append($("<td/>").append('<h4>Sender Id</h4>'));
+					      	row1.append($("<td/>").append('<h4>Content</h4>'));
+					      	table.append(row1);
+					        for (var i = 0; i < messages.length; i++) {
+					            var row = $("<tr/>");
+					            row.append($("<td/>").append('<h6>' + messages[i].date + '</h6>'));
+					            row.append($("<td/>").append('<h6>' + messages[i].sender + '</h6>'));
+					      		row.append($("<td/>").append('<h6>' + messages[i].content + '</h6>'));
+
+					            table.append(row);
+					        }
+
+					    });
+					}
+
+					function getBuild() {
+					    $.get('/app/building/', function(data){
+					        buid_name = data.build;
+
+							var x = document.getElementById("demo1");
+						    x.innerHTML = "Building: " + buid_name; 
+							        
+
+					    });
+					}
+
+
+						var myVar;    
+						function doPeriod(){
+
+							getLocation()
+						    myVar = setTimeout(doPeriod, 10000);
+						}
+
+						var auxVar;    
+						function doPeriodMessage(){
+
+							getMessages()
+						    auxVar = setTimeout(doPeriodMessage, 500);
+						}
+
+						var auxVar1;    
+						function doPeriodBuilding(){
+
+							getBuild()
+						    auxVar1 = setTimeout(doPeriodBuilding, 500);
+						}
+
+						$(document).ready(function(){
+						    doPeriod();
+						    doPeriodMessage();
+						    doPeriodBuilding();
+						});
+
+			</script>
+
+
+	</head>
+	<body>
+	  	<h1>Welcome to Messages Dissemination </h1>
+
+
+	  	  
+	  	  <h4>IST ID: {{user.ist_id}} </h4>
+
+	  	 <h4> Name:  {{user.name}} </h4>
+
+	  	 <h4 id= "demo1" > 
+
+
+		<style>
+	 		 .hide { position:absolute; top:-1px; left:-1px; width:1px; height:1px; }
+		</style>
+		<iframe name="hiddenFrame" class="hide"></iframe>
+
+
+
+		<script >getLocation()</script>
+
+		<script>getMessages()</script>
+
+		<h4>My current coordinates </h4>
+		<p id="demo">
+
+			<h4> Only to Check exchanges </h4>
+			
+		<form action="{% url 'users:updateLocation' %}" method="post" >
+			  {% csrf_token %}
+		      <p>latitude <input type="numeric"  name="lat" required /> 
+		    longitude  <input type="numeric"  name="longit" required /> 
+       		<input type='submit' value='Submit'/></p>
+
+		</form>
+
+		</p>
+
+
+		<form action="{% url 'users:range' %}" method="post" >
+			  {% csrf_token %}
+		      <p>Range	      	 <input type="number" min="0" name="range" required/>
+		      <input type="submit"  /> </p>
+		</form>
+
+		<h4> Who is nearby me on: 
+		<a href="{% url 'users:nearbyBuilding' %}">myBuilding</a>   <a href="{% url 'users:nearbyRange' %}">myRange</a> </h4>
+
+
+
+		<form  method="post" action="{% url 'users:sendMessage' %}" >
+	            {% csrf_token %}
+	                <p>Insert a Message to users inside my Range:
+	                 <input type="text" name="message"/>
+	                 <input type="submit"  /> </p>
+		</form>
+
+
+		<form  method="post" action="{% url 'users:sendMessageBuild' %}" >
+	            {% csrf_token %}
+	                <p>Insert a Message to users in my Building:
+	                 <input type="text" name="message"/ >
+	                 <input type="submit"  /> </p>
+		</form>
+
+		<form  method="post" action="{% url 'users:logout' %}">
+	            {% csrf_token %}
+	            <br>
+	            <input type="submit" value="Lougout" />
+		</form>
+
+
+		</table>
+        <h4>Received messages </p> 
+        <table class="table" id='messages'>
+            <tbody>    
+            <div class="message">
+                <tr h>
+                    <td  >
+                        <h6>{{ message.date}}</h6>
+                    </td>
+                    <td >
+                        <h6>{{ message.content }}</h6>
+                    </td>
+                </tr>
+            </div>
+            </tbody>
+        </table>
+
+
+	</body>
+
+	
+{% else %}
+	
+	<body>
+  	<h1>Welcome to MessagesDissemination </h1>
+  	<a href="{% url 'users:login' %}">Login</a>
+	</body>
+{% endif %}
+
+
+</html>
+
