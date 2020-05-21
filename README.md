@@ -3,6 +3,9 @@
 Construção de uma aplicação WEB que tem como objetivo aos alunos do IST (restrito a alunos do IST pois é necessário autenticar com o sistema de autenticação do IST) que permite detetar através das coordenadas geográficas em que edifício do Técnico a pessoa se encontra e permite ver todas as pessoas que se encontram nesse edifício e enviar mensagem e receber por parte dessas pessoas em tempo real. Permite definir um range e enviar mensagens e receber para pessoas que se encontram dentro desse range.
 Ferramentas utilizadas: Django para a REST API, JavaScript, HTML, CSS para a interface do utilizador
 
+Nota: 19/20
+Relatório em:
+
 
 # Execução
 run locally:
